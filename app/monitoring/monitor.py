@@ -7,18 +7,50 @@ from app.system.observer import (
 from app.detector.detector import detect_cpu_incident
 from app.investigator.cpu import investigate_cpu_incident
 
+
+from app.core.models import CpuSample
+from app.monitoring.cpu_analysis import calculate_average_cpu
+
+
 def monitor(interval: float = 2.0):
+    cpu_history: list[CpuSample] = []
     while True:
         snapshot = get_system_snapshot()
+
+        average_cpu = calculate_average_cpu(cpu_history)
+
+        cpu_history.append(
+            CpuSample(
+                timestamp=snapshot.timestamp,
+                cpu_percent=snapshot.cpu_percent,
+            )
+        )
+
+        if len(cpu_history) > 10:
+            cpu_history.pop(0)
+
+        print(f"CPU HISTORY: {len(cpu_history)} samples")
+
+        cpu_difference = snapshot.cpu_percent - average_cpu
+
+        print(
+            f"RECENT CPU AVERAGE: {average_cpu:.1f}% "
+            f"| DIFFERENCE: {cpu_difference:+.1f}%"
+        )
         processes = get_running_processes()
 
-        incident = detect_cpu_incident(snapshot, processes)
+        incident = detect_cpu_incident(
+            snapshot,
+            processes,
+            average_cpu,
+            len(cpu_history),
+        )
 
         if incident:
             print("\n🚨 INCIDENT DETECTED")
             print(incident)
 
-            investigation = investigate_cpu_incident(incident)
+            investigation = investigate_cpu_incident(incident, snapshot)
 
             print("\n🔎 INVESTIGATION")
             print(investigation)

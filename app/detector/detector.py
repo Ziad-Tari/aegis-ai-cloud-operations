@@ -3,16 +3,28 @@ from app.core.models import Incident, ProcessSnapshot, SystemSnapshot
 
 CPU_THRESHOLD = 5.0
 HIGH_CPU_REQUIRED_COUNT = 3
+CPU_ANOMALY_DIFFERENCE = 5.0
+MIN_CPU_HISTORY = 3
 
 _high_cpu_count = 0
     
 def detect_cpu_incident(
     snapshot: SystemSnapshot,
     processes: list[ProcessSnapshot],
+    average_cpu: float,
+    history_size: int,
 ) -> Incident | None:
+
     global _high_cpu_count
 
-    if snapshot.cpu_percent <= CPU_THRESHOLD:
+    if history_size < MIN_CPU_HISTORY:
+        _high_cpu_count = 0
+        return None
+
+    if (
+    snapshot.cpu_percent <= CPU_THRESHOLD
+    or snapshot.cpu_percent - average_cpu < CPU_ANOMALY_DIFFERENCE
+    ):
         _high_cpu_count = 0
         return None
 

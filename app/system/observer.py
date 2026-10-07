@@ -36,9 +36,12 @@ def get_running_processes() -> list[ProcessSnapshot]:
             if process.info["pid"] == 0:
                 continue
 
-            process.cpu_percent(interval=None)
+            try:
+                process.cpu_percent(interval=None)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
+                continue
 
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
+        except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
             continue
 
     # Wait once for the measurement interval
@@ -53,8 +56,15 @@ def get_running_processes() -> list[ProcessSnapshot]:
             if process.info["pid"] == 0:
                 continue
 
-            cpu_percent = process.cpu_percent(interval=None)
-            memory_percent = process.memory_percent()
+            try:
+                cpu_percent = process.cpu_percent(interval=None)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
+                continue
+            
+            try:
+                memory_percent = process.memory_percent()
+            except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
+                continue
             processes.append(
                 ProcessSnapshot(
                     pid=process.info["pid"],
@@ -64,7 +74,7 @@ def get_running_processes() -> list[ProcessSnapshot]:
                 )
             )           
 
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
+        except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
             continue
 
     return processes

@@ -30,3 +30,8 @@ class Investigation:
     incident_type: str
     summary: str
     findings: list[str]
+
+@dataclass
+class CpuSample:
+    timestamp: datetime
+    cpu_percent: float
