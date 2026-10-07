@@ -4,16 +4,22 @@ from app.core.models import Incident, Investigation
 def investigate_cpu_incident(
     incident: Incident,
 ) -> Investigation:
-    findings = []
-
-    for evidence in incident.evidence:
-        findings.append(
-            f"High CPU process detected: {evidence}"
+    if not incident.evidence:
+        return Investigation(
+            incident_type=incident.type,
+            summary="No process evidence was available.",
+            findings=[],
         )
 
+    primary_process = incident.evidence[0]
+
+    findings = [
+        f"Primary CPU contributor: {primary_process}",
+    ]
+
     summary = (
-        "CPU pressure was detected and the following "
-        "processes are the primary contributors."
+        "The incident is primarily associated with "
+        f"{primary_process}."
     )
 
     return Investigation(
