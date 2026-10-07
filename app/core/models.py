@@ -9,9 +9,24 @@ class SystemSnapshot:
     memory_percent: float
     disk_percent: float
 
+
 @dataclass
 class ProcessSnapshot:
     pid: int
     name: str
     cpu_percent: float
     memory_percent: float
+
+
+@dataclass
+class Incident:
+    timestamp: datetime
+    type: str
+    message: str
+    evidence: list[str]
+
+@dataclass
+class Investigation:
+    incident_type: str
+    summary: str
+    findings: list[str]

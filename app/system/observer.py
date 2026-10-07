@@ -30,7 +30,7 @@ def get_running_processes() -> list[ProcessSnapshot]:
 
     # First snapshot: establish CPU baseline
     for process in psutil.process_iter(
-        ["pid", "name", "memory_percent"]
+        ["pid", "name"]
     ):
         try:
             if process.info["pid"] == 0:
@@ -47,20 +47,20 @@ def get_running_processes() -> list[ProcessSnapshot]:
 
     # Second snapshot: calculate CPU usage
     for process in psutil.process_iter(
-        ["pid", "name", "memory_percent"]
+        ["pid", "name"]
     ):
         try:
             if process.info["pid"] == 0:
                 continue
 
             cpu_percent = process.cpu_percent(interval=None)
-
+            memory_percent = process.memory_percent()
             processes.append(
                 ProcessSnapshot(
                     pid=process.info["pid"],
                     name=process.info["name"],
                     cpu_percent=cpu_percent,
-                    memory_percent=process.info["memory_percent"],
+                    memory_percent=memory_percent,
                 )
             )           
 
