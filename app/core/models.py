@@ -19,11 +19,20 @@ class ProcessSnapshot:
 
 
 @dataclass
+class ProcessEvidence:
+    pid: int
+    name: str
+    cpu_percent: float
+    memory_percent: float
+
+
+
+@dataclass
 class Incident:
     timestamp: datetime
     type: str
     message: str
-    evidence: list[str]
+    evidence: list[ProcessEvidence]
 
 @dataclass
 class Investigation:

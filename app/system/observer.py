@@ -25,56 +25,45 @@ def get_system_snapshot() -> SystemSnapshot:
         disk_percent=get_disk_usage(),
     )
 
+
 def get_running_processes() -> list[ProcessSnapshot]:
     processes = []
 
-    # First snapshot: establish CPU baseline
-    for process in psutil.process_iter(
-        ["pid", "name"]
-    ):
+    # First snapshot: establish CPU baselines
+    for process in psutil.process_iter(["pid", "name"]):
         try:
             if process.info["pid"] == 0:
                 continue
 
-            try:
-                process.cpu_percent(interval=None)
-            except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
-                continue
+            process.cpu_percent(interval=None)
+            processes.append(process)
 
         except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
             continue
 
     # Wait once for the measurement interval
-    
     time.sleep(0.1)
 
     # Second snapshot: calculate CPU usage
-    for process in psutil.process_iter(
-        ["pid", "name"]
-    ):
-        try:
-            if process.info["pid"] == 0:
-                continue
+    snapshots = []
 
-            try:
-                cpu_percent = process.cpu_percent(interval=None)
-            except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
-                continue
-            
-            try:
-                memory_percent = process.memory_percent()
-            except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
-                continue
-            processes.append(
+    for process in processes:
+        try:
+            name = process.info["name"]
+            cpu_percent = process.cpu_percent(interval=None)
+            memory_percent = process.memory_percent()
+
+            snapshots.append(
                 ProcessSnapshot(
-                    pid=process.info["pid"],
-                    name=process.info["name"],
+                    pid=process.pid,
+                    name=name,
                     cpu_percent=cpu_percent,
                     memory_percent=memory_percent,
                 )
-            )           
+            )
 
         except (psutil.NoSuchProcess, psutil.AccessDenied, PermissionError):
             continue
 
-    return processes
+    return snapshots
+

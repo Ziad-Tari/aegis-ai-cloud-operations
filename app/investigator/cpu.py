@@ -14,7 +14,11 @@ def investigate_cpu_incident(
     primary_process = incident.evidence[0]
 
     findings = [
-        f"Primary CPU contributor: {primary_process}",
+        (
+            f"Primary CPU contributor: {primary_process.name} "
+            f"(PID {primary_process.pid})"
+        ),
+        f"Process CPU usage: {primary_process.cpu_percent:.1f}%",
         f"System CPU usage at detection: {snapshot.cpu_percent:.1f}%",
     ]
 
@@ -26,9 +30,10 @@ def investigate_cpu_incident(
 
     summary = (
         "The incident is primarily associated with "
-        f"{primary_process}. "
+        f"{primary_process.name} (PID {primary_process.pid}), "
+        f"which reported {primary_process.cpu_percent:.1f}% process CPU usage. "
         f"System CPU usage was {snapshot.cpu_percent:.1f}%."
-        )
+    )
 
     return Investigation(
         incident_type=incident.type,

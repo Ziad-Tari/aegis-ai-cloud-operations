@@ -1,5 +1,9 @@
-from app.core.models import Incident, ProcessSnapshot, SystemSnapshot
-
+from app.core.models import (
+    Incident,
+    ProcessEvidence,
+    ProcessSnapshot,
+    SystemSnapshot,
+)
 
 CPU_THRESHOLD = 5.0
 HIGH_CPU_REQUIRED_COUNT = 3
@@ -41,7 +45,12 @@ def detect_cpu_incident(
         )[:3]
 
         evidence = [
-            f"{process.name} (PID {process.pid}) → {process.cpu_percent:.1f}% CPU"
+            ProcessEvidence(
+                pid=process.pid,
+                name=process.name,
+                cpu_percent=process.cpu_percent,
+                memory_percent=process.memory_percent,
+            )
             for process in top_processes
         ]
 
