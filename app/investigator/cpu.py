@@ -1,4 +1,6 @@
+
 from app.core.models import Incident, Investigation, SystemSnapshot
+
 
 def investigate_cpu_incident(
     incident: Incident,
@@ -8,10 +10,19 @@ def investigate_cpu_incident(
         return Investigation(
             incident_type=incident.type,
             summary="No process evidence was available.",
-            findings=[],
+            findings=[
+                "The incident cannot be attributed to a specific process.",
+                f"System CPU usage at detection: {snapshot.cpu_percent:.1f}%",
+            ],
         )
 
-    primary_process = incident.evidence[0]
+    processes = sorted(
+        incident.evidence,
+        key=lambda process: process.cpu_percent,
+        reverse=True,
+    )
+
+    primary_process = processes[0]
 
     findings = [
         (
@@ -22,16 +33,29 @@ def investigate_cpu_incident(
         f"System CPU usage at detection: {snapshot.cpu_percent:.1f}%",
     ]
 
+    for process in processes[1:]:
+        findings.append(
+            f"Other contributing process: {process.name} "
+            f"(PID {process.pid}), "
+            f"{process.cpu_percent:.1f}% CPU"
+        )
+
     if snapshot.cpu_percent < 50.0:
         findings.append(
-            "System-wide CPU usage is moderate despite high "
-            "process-level CPU activity."
+            "System-wide CPU usage is moderate despite the "
+            "reported process-level CPU activity."
+        )
+    else:
+        findings.append(
+            "System CPU usage is elevated and may indicate "
+            "broader resource pressure."
         )
 
     summary = (
-        "The incident is primarily associated with "
-        f"{primary_process.name} (PID {primary_process.pid}), "
-        f"which reported {primary_process.cpu_percent:.1f}% process CPU usage. "
+        f"Identified {len(processes)} process(es) in the incident evidence. "
+        f"The highest reported contributor is {primary_process.name} "
+        f"(PID {primary_process.pid}) at "
+        f"{primary_process.cpu_percent:.1f}% process CPU usage. "
         f"System CPU usage was {snapshot.cpu_percent:.1f}%."
     )
 

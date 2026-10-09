@@ -1,0 +1,19 @@
+@'
+>> import sqlite3
+>> 
+>> connection = sqlite3.connect("data/aegis.db")
+>> connection.row_factory = sqlite3.Row
+>> 
+>> rows = connection.execute("SELECT * FROM incidents ORDER BY id DESC").fetchall()
+>> 
+>> for row in rows:
+>>     print(dict(row))
+>> 
+>> if not rows:
+>>     print("No incidents stored yet.")
+>> 
+>> connection.close()
+>> '@ | python -
+No incidents stored yet.
+PS C:\Users\tarik\UNI\Aegis> ^C
+PS C:\Users\tarik\UNI\Aegis> 

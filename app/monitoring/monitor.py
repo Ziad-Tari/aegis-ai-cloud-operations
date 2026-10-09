@@ -10,9 +10,11 @@ from app.investigator.cpu import investigate_cpu_incident
 
 from app.core.models import CpuSample
 from app.monitoring.cpu_analysis import calculate_average_cpu
+from app.storage.incident_store import initialize_database, save_incident
 
 
 def monitor(interval: float = 2.0):
+    initialize_database()
     cpu_history: list[CpuSample] = []
     while True:
         snapshot = get_system_snapshot()
@@ -51,6 +53,8 @@ def monitor(interval: float = 2.0):
             print(incident)
 
             investigation = investigate_cpu_incident(incident, snapshot)
+            incident_id = save_incident(incident, investigation)
+            print(f"\nSAVED INCIDENT | ID: {incident_id}")
 
             print("\n🔎 INVESTIGATION")
             print(investigation)

@@ -5,9 +5,9 @@ from app.core.models import (
     SystemSnapshot,
 )
 
-CPU_THRESHOLD = 5.0
+CPU_THRESHOLD = 2.5
 HIGH_CPU_REQUIRED_COUNT = 3
-CPU_ANOMALY_DIFFERENCE = 5.0
+CPU_ANOMALY_DIFFERENCE =-30.0
 MIN_CPU_HISTORY = 3
 
 _high_cpu_count = 0
