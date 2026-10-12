@@ -16,3 +16,15 @@ class ContainerSnapshot:
             return None
 
         return self.memory_bytes / (1024 ** 2)
+
+
+@dataclass
+class ContainerIncident:
+    incident_type: str
+    container_name: str
+    service: str
+    observed_value: float
+    threshold: float
+    unit: str
+    message: str
+    observed_at: datetime
