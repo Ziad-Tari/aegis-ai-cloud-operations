@@ -25,6 +25,15 @@ class ProcessEvidence:
     cpu_percent: float
     memory_percent: float
 
+@dataclass
+class ContainerEvidence:
+    container_name: str
+    service: str
+    metric_type: str
+    observed_value: float
+    threshold: float
+    unit: str
+
 
 
 @dataclass
@@ -32,7 +41,7 @@ class Incident:
     timestamp: datetime
     type: str
     message: str
-    evidence: list[ProcessEvidence]
+    evidence: list[ProcessEvidence | ContainerEvidence]
 
 @dataclass
 class Investigation:
@@ -44,3 +53,5 @@ class Investigation:
 class CpuSample:
     timestamp: datetime
     cpu_percent: float
+
+
