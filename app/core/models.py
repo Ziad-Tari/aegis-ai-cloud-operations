@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 
@@ -66,6 +66,13 @@ class Investigation:
     incident_type: str
     summary: str
     findings: list[str]
+    possible_causes: list[str] = field(default_factory=list)
+    evidence_references: list[str] = field(default_factory=list)
+    confidence: str = "low"
+    confidence_rationale: str = (
+        "No confidence assessment was provided."
+    )
+    next_steps: list[str] = field(default_factory=list)
 
 @dataclass
 class CpuSample:

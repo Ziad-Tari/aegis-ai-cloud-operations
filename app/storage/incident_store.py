@@ -133,3 +133,25 @@ def get_incident(incident_id: int) -> dict | None:
         ).fetchone()
 
     return _row_to_dict(row) if row else None
+
+
+def save_investigation(
+    incident_id: int,
+    investigation: Investigation,
+) -> bool:
+    """Update an existing incident's investigation without duplicating it."""
+    initialize_database()
+
+    investigation_json = json.dumps(asdict(investigation))
+
+    with sqlite3.connect(DATABASE_PATH) as connection:
+        cursor = connection.execute(
+            """
+            UPDATE incidents
+            SET investigation_json = ?
+            WHERE id = ?
+            """,
+            (investigation_json, incident_id),
+        )
+
+        return cursor.rowcount > 0

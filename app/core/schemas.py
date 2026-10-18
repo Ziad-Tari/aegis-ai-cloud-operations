@@ -22,6 +22,13 @@ class InvestigationResponse(BaseModel):
     incident_type: str
     summary: str
     findings: list[str]
+    possible_causes: list[str] = []
+    evidence_references: list[str] = []
+    confidence: str = "low"
+    confidence_rationale: str = (
+        "No confidence assessment was provided."
+    )
+    next_steps: list[str] = []
 
 class ContainerHealthEvidenceResponse(BaseModel):
     container_name: str

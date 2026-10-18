@@ -8,8 +8,15 @@ from app.storage.incident_store import (
     get_incident,
     initialize_database,
     list_incidents,
+    save_investigation,
 )
 from app.core.schemas import IncidentResponse, ProcessEvidenceResponse, InvestigationResponse
+from app.core.models import Investigation
+from app.investigator.ai import (
+    AIProviderError,
+    AIResponseError,
+    investigate_incident,
+)
 
 
 app = FastAPI(
@@ -67,3 +74,49 @@ def read_incident(incident_id: int) -> dict:
         raise HTTPException(status_code=404, detail="Incident not found")
 
     return incident
+
+
+
+@app.post(
+    "/incidents/{incident_id}/investigate",
+    response_model=IncidentResponse,
+)
+def investigate_stored_incident(incident_id: int) -> dict:
+    incident = get_incident(incident_id)
+
+    if incident is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Incident not found",
+        )
+
+    try:
+        investigation = investigate_incident(incident)
+    except AIProviderError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="AI investigation service is unavailable.",
+        ) from exc
+    except AIResponseError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail="AI returned an invalid investigation report.",
+        ) from exc
+
+    saved = save_investigation(incident_id, investigation)
+
+    if not saved:
+        raise HTTPException(
+            status_code=404,
+            detail="Incident no longer exists",
+        )
+
+    updated_incident = get_incident(incident_id)
+
+    if updated_incident is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Incident not found after investigation",
+        )
+
+    return updated_incident
