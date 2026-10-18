@@ -28,3 +28,36 @@ class ContainerIncident:
     unit: str
     message: str
     observed_at: datetime
+
+
+@dataclass
+class ContainerHealthSnapshot:
+    container_name: str
+    service: str
+    status: str
+    health_status: str | None
+    restart_count: int
+    observed_at: datetime
+
+
+@dataclass
+class ContainerHealthIncident:
+    incident_type: str
+    container_name: str
+    service: str
+    status: str
+    health_status: str | None
+    restart_count: int
+    message: str
+    observed_at: datetime
+
+
+
+@dataclass
+class ContainerLogSnapshot:
+    container_name: str
+    service: str
+    lines: list[str]
+    truncated: bool
+    observed_at: datetime
+

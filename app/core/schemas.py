@@ -23,6 +23,19 @@ class InvestigationResponse(BaseModel):
     summary: str
     findings: list[str]
 
+class ContainerHealthEvidenceResponse(BaseModel):
+    container_name: str
+    service: str
+    status: str
+    health_status: str | None
+    restart_count: int
+    details: str
+
+class ContainerLogEvidenceResponse(BaseModel):
+    container_name: str
+    service: str
+    lines: list[str]
+    truncated: bool
 
 class IncidentResponse(BaseModel):
     id: int
@@ -30,6 +43,9 @@ class IncidentResponse(BaseModel):
     incident_type: str
     message: str
     evidence: list[
-        ProcessEvidenceResponse | ContainerEvidenceResponse
+        ProcessEvidenceResponse | ContainerEvidenceResponse | ContainerHealthEvidenceResponse | ContainerLogEvidenceResponse
     ]
     investigation: InvestigationResponse | None = None
+
+
+

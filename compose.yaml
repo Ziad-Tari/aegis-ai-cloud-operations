@@ -31,12 +31,20 @@ services:
       - "/dev/disk:/dev/disk:ro"
     restart: unless-stopped
 
+  
   demo:
     image: nginx:alpine
     container_name: aegis-demo
     ports:
       - "8081:80"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1/"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
 
 volumes:
   prometheus_data:

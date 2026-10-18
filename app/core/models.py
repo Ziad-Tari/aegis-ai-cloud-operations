@@ -35,13 +35,31 @@ class ContainerEvidence:
     unit: str
 
 
+@dataclass
+class ContainerLogEvidence:
+    container_name: str
+    service: str
+    lines: list[str]
+    truncated: bool
+
+
+@dataclass
+class ContainerHealthEvidence:
+    container_name: str
+    service: str
+    status: str
+    health_status: str | None
+    restart_count: int
+    details: str
+
+
 
 @dataclass
 class Incident:
     timestamp: datetime
     type: str
     message: str
-    evidence: list[ProcessEvidence | ContainerEvidence]
+    evidence: list[ProcessEvidence | ContainerEvidence | ContainerHealthEvidence | ContainerLogEvidence]
 
 @dataclass
 class Investigation:
@@ -53,5 +71,8 @@ class Investigation:
 class CpuSample:
     timestamp: datetime
     cpu_percent: float
+
+
+
 
 
