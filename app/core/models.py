@@ -53,6 +53,12 @@ class ContainerHealthEvidence:
     details: str
 
 
+@dataclass
+class InvestigationClaim:
+    text: str
+    evidence_references: list[str] = field(default_factory=list)
+    source: str = "unspecified"
+
 
 @dataclass
 class Incident:
@@ -73,6 +79,12 @@ class Investigation:
         "No confidence assessment was provided."
     )
     next_steps: list[str] = field(default_factory=list)
+    
+    observations: list[InvestigationClaim] = field(default_factory=list)
+    hypotheses: list[InvestigationClaim] = field(default_factory=list)
+    unknowns: list[str] = field(default_factory=list)
+    missing_evidence: list[str] = field(default_factory=list)
+
 
 @dataclass
 class CpuSample:

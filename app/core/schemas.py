@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 class ProcessEvidenceResponse(BaseModel):
@@ -18,6 +18,12 @@ class ContainerEvidenceResponse(BaseModel):
     unit: str
 
 
+class InvestigationClaimResponse(BaseModel):
+    text: str
+    evidence_references: list[str] = Field(default_factory=list)
+    source: str = "unspecified"
+
+
 class InvestigationResponse(BaseModel):
     incident_type: str
     summary: str
@@ -29,6 +35,16 @@ class InvestigationResponse(BaseModel):
         "No confidence assessment was provided."
     )
     next_steps: list[str] = []
+    
+    observations: list[InvestigationClaimResponse] = Field(
+        default_factory=list
+    )
+    hypotheses: list[InvestigationClaimResponse] = Field(
+        default_factory=list
+    )
+    unknowns: list[str] = Field(default_factory=list)
+    missing_evidence: list[str] = Field(default_factory=list)
+
 
 class ContainerHealthEvidenceResponse(BaseModel):
     container_name: str

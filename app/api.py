@@ -1,8 +1,7 @@
 
 from datetime import datetime
-
+import logging
 from fastapi import FastAPI, HTTPException, Query
-# from pydantic import BaseModel
 
 from app.storage.incident_store import (
     get_incident,
@@ -24,7 +23,7 @@ app = FastAPI(
     description="Infrastructure incident monitoring and investigation",
     version="0.1.0",
 )
-
+logger = logging.getLogger(__name__)
 
 # class ProcessEvidenceResponse(BaseModel):
 #     pid: int
@@ -100,7 +99,7 @@ def investigate_stored_incident(incident_id: int) -> dict:
     except AIResponseError as exc:
         raise HTTPException(
             status_code=502,
-            detail="AI returned an invalid investigation report.",
+            detail=str(exc),
         ) from exc
 
     saved = save_investigation(incident_id, investigation)
